@@ -212,25 +212,6 @@ resource "rancher2_role_template" "clusterrole" {
   ]
 }
 
-resource "rancher2_role_template" "projectrole" {
-  name              = "View Services & Services/Proxy"
-  description       = "View Services & Services/Proxy"
-  context           = "project"
-  default_role      = false
-
-  rules {
-    api_groups = ["*"]
-    resources = ["services"]
-    verbs = ["get", "list", "watch"]
-  }
-
-  rules {
-    api_groups = ["*"]
-    resources = ["services/proxy"]
-    verbs = ["get", "list", "watch"]
-  }
-}
-
 resource "rancher2_cluster_role_template_binding" "clusterrolebinding-csi" {
   count     = var.cluster_csi_support ? 1 : 0
 
@@ -247,6 +228,42 @@ resource "rancher2_cluster_role_template_binding" "clusterrolebinding-nocsi" {
   cluster_id       = rancher2_cluster.nocsi.0.id
   role_template_id = rancher2_role_template.clusterrole.id
   user_id          = rancher2_user.admin-nocsi.0.id
+}
+
+resource "rancher2_project_role_template_binding" "admin-default-nocsi" {
+  count     = var.cluster_csi_support ? 0 : 1
+
+  name              = "admin-default"
+  project_id        = data.rancher2_project.default-nocsi.0.id
+  role_template_id  = "project-owner"
+  user_id           = rancher2_user.admin-nocsi.0.id
+}
+
+resource "rancher2_project_role_template_binding" "admin-default-csi" {
+  count     = var.cluster_csi_support ? 1 : 0
+
+  name              = "admin-default"
+  project_id        = data.rancher2_project.default-csi.0.id
+  role_template_id  = "project-owner"
+  user_id           = rancher2_user.admin-csi.0.id
+}
+
+resource "rancher2_project_role_template_binding" "admin-system-nocsi" {
+  count     = var.cluster_csi_support ? 0 : 1
+
+  name              = "admin-system"
+  project_id        = data.rancher2_project.system-nocsi.0.id
+  role_template_id  = "project-owner"
+  user_id           = rancher2_user.admin-nocsi.0.id
+}
+
+resource "rancher2_project_role_template_binding" "admin-system-csi" {
+  count     = var.cluster_csi_support ? 1 : 0
+
+  name              = "admin-system"
+  project_id        = data.rancher2_project.system-csi.0.id
+  role_template_id  = "project-owner"
+  user_id           = rancher2_user.admin-csi.0.id
 }
 
 # CLOUD CREDENTIAL
