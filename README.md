@@ -21,7 +21,7 @@ Standard example (see the next example for persistent storage) :
 
 ```yaml
 module "rancher_k8s" {
-  source = "github.com/scalair/terraform-vsphere-rancher"
+  source = "github.com/scalair/terraform-rancher-vsphere"
 
   cluster_template_revision = "v3" # must be changed if any value from the template object is changed
   cluster_template_name = "default"
@@ -99,7 +99,7 @@ Example with CSI support :
 
 ```yaml
 module "rancher_k8s" {
-  source = "github.com/scalair/terraform-vsphere-rancher"
+  source = "github.com/scalair/terraform-rancher-vsphere"
 
   cluster_template_revision = "v3" # must be changed if any value from the template object is changed
   cluster_template_name = "default"
@@ -183,7 +183,7 @@ In order to enable persistent storage, please [read CSI/CPI documentation](docs/
 
 ## Versioning
 
-For the versions available, see the [tags on this repository](https://github.com/scalair/terraform-vsphere-rancher/tags).
+For the versions available, see the [tags on this repository](https://github.com/scalair/terraform-rancher-vsphere/tags).
 
 Additionaly you can see what change in each version in the [CHANGELOG.md](CHANGELOG.md) file.
 
