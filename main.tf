@@ -266,6 +266,26 @@ resource "rancher2_project_role_template_binding" "admin-system-csi" {
   user_id           = rancher2_user.admin-csi.0.id
 }
 
+# OTHER USERS
+
+resource "rancher2_user" "user-csi" {
+  count = var.cluster_csi_support ? length(var.users) : 0
+
+  name      = "User ${var.users[count.index].username} on ${rancher2_cluster.csi.0.name}"
+  username  = "${var.users[count.index].username}-${rancher2_cluster.csi.0.name}"
+  password  = var.users[count.index].password
+  enabled   = var.users[count.index].enabled
+}
+
+resource "rancher2_user" "user-nocsi" {
+  count = var.cluster_csi_support ? 0 : length(var.users)
+
+  name      = "User ${var.users[count.index].username} on ${rancher2_cluster.nocsi.0.name}"
+  username  = "${var.users[count.index].username}-${rancher2_cluster.nocsi.0.name}"
+  password  = var.users[count.index].password
+  enabled   = var.users[count.index].enabled
+}
+
 # CLOUD CREDENTIAL
 
 resource "rancher2_cloud_credential" "this" {

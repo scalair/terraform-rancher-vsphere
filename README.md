@@ -15,6 +15,19 @@ Terraform module that manages Kubernetes clusters through an existing [rancher s
   - vcenter's url
   - vcenter's username/password with sufficient privileges
 
+## Admin user
+
+The terraform module automatically creates an admin with full privileges within the cluster. This is the purpose of `admin_user` and `admin_password`.
+
+Once created, the `admin_user` is suffixed with the defined `cluster_name`.
+
+Let's imagine you've built with :
+
+- `admin_user` : "admin"
+- `cluster_name` : "k8spoc01"
+
+Then, the created admin username is `admin-k8spoc01`.
+
 ## Usage
 
 Standard example (see the next example for persistent storage) :
@@ -47,6 +60,19 @@ module "rancher_k8s" {
   
   admin_user     = "admin"
   admin_password = xxx
+
+  users = [
+    {
+      username  = "xat"
+      password  = "xxx"
+      enabled   = true
+    },
+    {
+      username  = "blakelead"
+      password  = "xxx"
+      enabled   = true
+    }
+  ]
 
   node_templates = {
     "worker1-4-16-ubuntu" = {
