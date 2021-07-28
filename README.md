@@ -63,14 +63,21 @@ module "rancher_k8s" {
 
   users = [
     {
-      username  = "xat"
-      password  = "xxx"
-      enabled   = true
+      username            = "xat"
+      password            = "xxx111"
+      enabled             = true
+      cluster_privileges  = [
+        "cluster-owner"
+      ]
     },
     {
-      username  = "blakelead"
-      password  = "xxx"
-      enabled   = true
+      username            = "blakelead"
+      password            = "xxx222"
+      enabled             = true
+      cluster_privileges  = [
+        "projects-view",
+        "nodes-view"
+      ]
     }
   ]
 

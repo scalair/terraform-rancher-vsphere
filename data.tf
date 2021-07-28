@@ -25,3 +25,9 @@ data "rancher2_project" "system-nocsi" {
     cluster_id = rancher2_cluster.nocsi.0.id
     name = "System"
 }
+
+data "rancher2_user" "users" {
+    count       = length(var.users)
+
+    username    = "${var.users[count.index].username}-${rancher2_cluster.nocsi.0.name}"
+}
