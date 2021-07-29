@@ -69,6 +69,20 @@ module "rancher_k8s" {
       cluster_privileges  = [
         "cluster-owner"
       ]
+      project_privileges  = [
+        {
+          project_name    = "Default"
+          privileges      = [
+            "project-owner"
+          ]
+        },
+        {
+          project_name    = "System"
+          privileges      = [
+            "project-owner"
+          ]
+        }
+      ]
     },
     {
       username            = "blakelead"
@@ -78,6 +92,7 @@ module "rancher_k8s" {
         "projects-view",
         "nodes-view"
       ]
+      project_privileges  = []
     }
   ]
 

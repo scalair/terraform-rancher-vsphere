@@ -128,6 +128,10 @@ variable "users" {
     password            = string
     enabled             = bool
     cluster_privileges  = list(string)
+    project_privileges  = list(object({
+      project_name      = string
+      privileges        = list(string)
+    }))
   }))
   description = "(Optional) A list of additional users with their privileges to create within the cluster."
   default     = []
