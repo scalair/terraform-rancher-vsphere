@@ -266,6 +266,95 @@ resource "rancher2_project_role_template_binding" "admin-system-csi" {
   user_id           = rancher2_user.admin-csi.0.id
 }
 
+# OTHER USERS
+
+resource "rancher2_user" "user-csi" {
+  count = var.cluster_csi_support ? length(var.users) : 0
+
+  name      = "User ${var.users[count.index].username} on ${rancher2_cluster.csi.0.name}"
+  username  = "${var.users[count.index].username}-${rancher2_cluster.csi.0.name}"
+  password  = var.users[count.index].password
+  enabled   = var.users[count.index].enabled
+}
+
+resource "rancher2_user" "user-nocsi" {
+  count = var.cluster_csi_support ? 0 : length(var.users)
+
+  name      = "User ${var.users[count.index].username} on ${rancher2_cluster.nocsi.0.name}"
+  username  = "${var.users[count.index].username}-${rancher2_cluster.nocsi.0.name}"
+  password  = var.users[count.index].password
+  enabled   = var.users[count.index].enabled
+}
+
+# OTHER USERS PRIVILEGES
+
+locals {
+  cluster_privileges = flatten([
+    for i, user in var.users: [
+      for k, privilege in user.cluster_privileges: {
+        privilege = privilege
+        username  = user.username
+        index     = i
+      }
+    ]
+  ])
+
+  project_privileges = flatten([
+    for i, user in var.users: [
+      for k, prjprivilege in user.project_privileges: [
+        for p, priv in prjprivilege.privileges:
+        {
+          project_name  = prjprivilege.project_name
+          project_id    = local.rancher_projects[prjprivilege.project_name]
+          privilege     = priv
+          username      = user.username
+          index         = i
+        }
+      ]
+    ]
+  ])
+
+  rancher_projects = var.cluster_csi_support ? { for i, project in data.rancher2_project.projects-csi: project.name => project.id } : { for i, project in data.rancher2_project.projects-nocsi: project.name => project.id }
+
+  rancher_users = { for i, user in data.rancher2_user.users: user.username => user.id }
+}
+
+resource "rancher2_cluster_role_template_binding" "userclusterrolebinding-csi" {
+  for_each          = var.cluster_csi_support ? { for k, v in local.cluster_privileges: k => v } : {}
+
+  name              = "${rancher2_cluster.csi.0.id}-${each.value.username}-${each.value.privilege}"
+  cluster_id        = rancher2_cluster.csi.0.id
+  role_template_id  = each.value.privilege
+  user_id           = local.rancher_users["${each.value.username}-${rancher2_cluster.csi.0.name}"]
+}
+
+resource "rancher2_cluster_role_template_binding" "userclusterrolebinding-nocsi" {
+  for_each          = var.cluster_csi_support ? {} : { for k, v in local.cluster_privileges: k => v }
+
+  name              = "${rancher2_cluster.nocsi.0.id}-${each.value.username}-${each.value.privilege}"
+  cluster_id        = rancher2_cluster.nocsi.0.id
+  role_template_id  = each.value.privilege
+  user_id           = local.rancher_users["${each.value.username}-${rancher2_cluster.nocsi.0.name}"]
+}
+
+resource "rancher2_project_role_template_binding" "userprojectrolebinding-csi" {
+  for_each          = var.cluster_csi_support ? { for k, v in local.project_privileges: k => v } : {}
+
+  name              = lower("${each.value.username}-${rancher2_cluster.nocsi.0.id}-${each.value.project_name}-${each.value.privilege}")
+  project_id        = each.value.project_id
+  role_template_id  = each.value.privilege
+  user_id           = local.rancher_users["${each.value.username}-${rancher2_cluster.nocsi.0.name}"]
+}
+
+resource "rancher2_project_role_template_binding" "userprojectrolebinding-nocsi" {
+  for_each          = var.cluster_csi_support ? {} : { for k, v in local.project_privileges: k => v }
+
+  name              = lower("${each.value.username}-${rancher2_cluster.nocsi.0.id}-${each.value.project_name}-${each.value.privilege}")
+  project_id        = each.value.project_id
+  role_template_id  = each.value.privilege
+  user_id           = local.rancher_users["${each.value.username}-${rancher2_cluster.nocsi.0.name}"]
+}
+
 # CLOUD CREDENTIAL
 
 resource "rancher2_cloud_credential" "this" {

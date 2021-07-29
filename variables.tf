@@ -106,7 +106,7 @@ variable "cluster_template_kubelet_extra_binds" {
   default     = []
 }
 
-# Users
+# Admin user
 
 variable "admin_user" {
   type        = string
@@ -118,6 +118,23 @@ variable "admin_password" {
   type        = string
   description = "(Required) The admin password"
   sensitive   = true
+}
+
+# Other users
+
+variable "users" {
+  type        = list(object({
+    username            = string
+    password            = string
+    enabled             = bool
+    cluster_privileges  = list(string)
+    project_privileges  = list(object({
+      project_name      = string
+      privileges        = list(string)
+    }))
+  }))
+  description = "(Optional) A list of additional users with their privileges to create within the cluster."
+  default     = []
 }
 
 # Node template & node pool
@@ -141,4 +158,3 @@ variable "kubernetes_manifests" {
   description = "(Optional) Kubernetes manifests to apply"
   default     = []
 }
-
