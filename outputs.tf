@@ -1,5 +1,5 @@
 output "cluster_id" {
-  value = var.cluster_csi_support ? rancher2_cluster.csi.0.id : rancher2_cluster.nocsi.0.id
+  value = rancher2_cluster.this.id
 }
 
 output "node_templates" {
@@ -7,21 +7,21 @@ output "node_templates" {
 }
 
 output "node_pools" {
-  value = var.cluster_csi_support ? keys(rancher2_node_pool.csi) : keys(rancher2_node_pool.nocsi)
+  value = keys(rancher2_node_pool.this)
 }
 
 output "admin_id" {
-  value = var.cluster_csi_support ? rancher2_user.admin-csi.0.id : rancher2_user.admin-nocsi.0.id
+  value = rancher2_user.admin.id
 }
 
 output "admin_principal_ids" {
-  value = var.cluster_csi_support ? rancher2_user.admin-csi.0.principal_ids : rancher2_user.admin-nocsi.0.principal_ids
+  value = rancher2_user.admin.principal_ids
 }
 
 output "users_id" {
-  value = var.cluster_csi_support ? rancher2_user.user-csi.*.id : rancher2_user.user-nocsi.*.id
+  value = rancher2_user.user.*.id
 }
 
 output "users_principal_ids" {
-  value = var.cluster_csi_support ? rancher2_user.user-csi.*.principal_ids : rancher2_user.user-nocsi.*.principal_ids
+  value = rancher2_user.user.*.principal_ids
 }
