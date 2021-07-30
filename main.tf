@@ -60,12 +60,9 @@ resource "rancher2_cluster_template" "nocsi" {
           kube_api {
             secrets_encryption_config { enabled = false }
           }
-          #kubelet {
-          #  extra_binds = var.cluster_template_kubelet_extra_binds
-          #  extra_args  = {
-          #    cloud-provider  = "external"
-          #  }
-          #}
+          kubelet {
+            extra_binds = var.cluster_template_kubelet_extra_binds
+          }
         }
       }
     }
